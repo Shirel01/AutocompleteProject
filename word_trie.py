@@ -23,13 +23,13 @@ class WordTrie:
     def __init__(self):
         self.root = TrieNode("")
 
-    def insert(self, word: WordNode):
+    def insert(self, word_node: WordNode):
         """Insert a word into the trie"""
         node = self.root
-
+        word = word_node.word
         # Loop through each character in the word
         # Check if there is no child containing the character, create a new child for the current node
-        for char in sentence_trie.WordNode.word:
+        for char in word:
             if char in node.children:
                 node = node.children[char]
             else:
@@ -40,7 +40,7 @@ class WordTrie:
         node.is_end_of_word = True
         # Increment the counter to indicate that we see this word once more
         node.counter += 1
-        node.sentenceTrieRef.append(word)
+        node.sentenceTrieRef.append(word_node)
 
 
 

@@ -1,5 +1,4 @@
 
-
 class WordNode:
     def __init__(self, word, father, children=None):
         self.word = word
@@ -32,24 +31,21 @@ class SentenceTrie:
         for child in father.children:
             if child.word == word:
                 return child
-        node = WordNode(word, father) #create a new node with the word that we have added
-        father.children.append(node) #add this children to the father
+        node = WordNode(word, father)  # create a new node with the word that we have added
+        father.children.append(node)  # add this children to the father
         return node
 
+    def traverse(self):
+        """
+        Traverses the SentenceTrie and returns a list of all word nodes.
+        :return: List[WordNode]
+        """
+        result = []
 
-    def traverse(self, node=None, words=None):
-        """
-        Traverse the SentenceTrie to collect all words.
-        :param node: current node
-        :param words: list of words
-        :return: list of words
-        """
-        if node is None:
-            node = self.root
-        if words is None:
-            words = []
-        if node.word:
-            words.append(node.word)
-        for child in node.children:
-            self.traverse(child, words)
-        return words
+        def traverse_node(node):
+            for child in node.children:
+                result.append(child)
+                traverse_node(child)
+
+        traverse_node(self.root)
+        return result
