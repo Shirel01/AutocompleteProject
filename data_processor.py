@@ -11,7 +11,7 @@ def clean_text(text):
     text = ' '.join(text.split())  # Remove extra spaces
     return text.strip()
 
-
+#in future change this functioon so that it it just a call to a insertsentenceinsentencetrie
 def build_tries_from_files(directory, sentence_trie, word_trie):
     """
     Read files from directory, clean text, and insert sentences into a trie. Then from the sentence trie build the word Trie.
@@ -24,10 +24,11 @@ def build_tries_from_files(directory, sentence_trie, word_trie):
         for file in files:
             if file.endswith(".txt"):
                 file_path = os.path.join(root, file)
+                file_name = os.path.basename(file_path) #only the filename without the path
                 with open(file_path, 'r', encoding='utf-8') as f:
                     for line in f:
                         cleaned_sentence = clean_text(line)
-                        sentence_trie.add_sentence(cleaned_sentence)
+                        sentence_trie.add_sentence(cleaned_sentence, file_name)
 
     #insert words from sentence trie to word Trie
     word_trie.insert_data(sentence_trie)
@@ -39,4 +40,5 @@ if __name__ == "__main__":
     word_trie = word_trie.WordTrie()
     directory_path = "C:/Users/shire/Downloads/Archive2"
     build_tries_from_files(directory_path, sentenceTrie, word_trie)
+    word_trie.search_prefix('th')
 

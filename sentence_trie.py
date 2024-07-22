@@ -1,16 +1,18 @@
 import typing
 class WordNode:
-    def __init__(self, word, father, children=None):
+    def __init__(self, word, father, sources=None, children=None):
         self.word = word
         self.father = father
+        self.sources = sources or []     #add field source
         self.children = children or []
+
 
 
 class SentenceTrie:
     def __init__(self):
         self.root = WordNode(None, None)
 
-    def add_sentence(self, sentence: str) -> None:
+    def add_sentence(self, sentence: str, source_file:str) -> None:
         """
         Adds a sentence to the trie
         :param sentence: str
@@ -19,9 +21,9 @@ class SentenceTrie:
         words = sentence.split()
         node = self.root
         for word in words:
-            node = self.add_word(word, node)
+            node = self.add_word(word, node, source_file)
 
-    def add_word(self, word: str, father: WordNode) -> WordNode:
+    def add_word(self, word: str, father: WordNode, source_file: str) -> WordNode:
         """
         Adds a word to the trie, called only by add_sentence
         :param word: the current word in the sentence
@@ -30,8 +32,11 @@ class SentenceTrie:
         """
         for child in father.children:
             if child.word == word:
+                if source_file not in child.sources:
+                    child.sources.append(source_file)
+
                 return child
-        node = WordNode(word, father)  # create a new node with the word that we have added
+        node = WordNode(word, father, [source_file])  # create a new node with the word that we have added
         father.children.append(node)  # add this children to the father
         return node
 

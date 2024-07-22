@@ -58,7 +58,7 @@ class WordTrie:
                 word while traversing the trie
         """
         if node.is_end_of_word:
-            self.output.append((prefix + node.char, node.counter))
+            self.output.append((prefix + node.char, node.counter, node.sentenceTrieRef))
 
         for child in node.children.values():
             self.dfs(child, prefix + node.char)
@@ -74,7 +74,10 @@ class WordTrie:
             else:
                 return []
         self.dfs(node, prefix[:-1])
-        #print(self.output)
         return sorted(self.output, key=lambda prefix: prefix[1], reverse=True)  # sorted according to counter
+
+
+
+
 
 
