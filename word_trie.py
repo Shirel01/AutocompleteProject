@@ -1,6 +1,9 @@
 import sentence_trie
 from sentence_trie import WordNode
 import typing
+from dataclasses import dataclass
+import typing
+
 
 class TrieNode:
     """A node in the trie structure"""
@@ -75,9 +78,6 @@ class WordTrie:
                 return []
         self.dfs(node, prefix[:-1])
         return sorted(self.output, key=lambda prefix: prefix[1], reverse=True)  # sorted according to counter
-
-
-
 
 
 

@@ -40,5 +40,12 @@ if __name__ == "__main__":
     word_trie = word_trie.WordTrie()
     directory_path = "C:/Users/shire/Downloads/Archive2"
     build_tries_from_files(directory_path, sentenceTrie, word_trie)
-    word_trie.search_prefix('th')
+    search_results = word_trie.search_prefix('is')
+
+    for word, frequency, references in search_results:
+        print(f"Word: {word}, Frequency: {frequency}")
+        for ref in references:
+            sentence, source = sentenceTrie.reconstruct_sentence(ref)
+            print(f"Complete Sentence: {sentence}, Source: {source}")
+
 

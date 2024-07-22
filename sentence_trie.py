@@ -57,3 +57,31 @@ class SentenceTrie:
             stack.extend(current_node.children)
 
         return nodes
+
+    def reconstruct_sentence(self, node: WordNode) -> typing.Tuple[typing.List[str], str]:
+        words = []
+        original_node = node
+        while node.father is not None:
+            if node.word is not None:
+                words.append(node.word)
+            node = node.father
+        words.reverse()
+
+        def complete_sentence_iterative(start_node: WordNode, initial_sentence: typing.List[str]) -> typing.List[str]:
+            stack = [(start_node, initial_sentence)]
+            sentences = []
+
+            while stack:
+                current_node, current_sentence = stack.pop()
+                if not current_node.children:
+                    sentences.append(' '.join(current_sentence))
+                else:
+                    for child in current_node.children:
+                        stack.append((child, current_sentence + [child.word]))
+
+            return sentences
+
+        initial_sentence = words[:]
+        # Start completing the sentence from the original node where prefix ends
+        complete_sentences = complete_sentence_iterative(original_node, initial_sentence)
+        return complete_sentences, original_node.sources
