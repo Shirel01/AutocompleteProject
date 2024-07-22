@@ -12,7 +12,7 @@ def clean_text(text):
     return text.strip()
 
 
-def build_trie_from_files(directory, sentence_trie, word_trie):
+def build_tries_from_files(directory, sentence_trie, word_trie):
     """
     Read files from directory, clean text, and insert sentences into a trie. Then from the sentence trie build the word Trie.
 
@@ -28,15 +28,15 @@ def build_trie_from_files(directory, sentence_trie, word_trie):
                     for line in f:
                         cleaned_sentence = clean_text(line)
                         sentence_trie.add_sentence(cleaned_sentence)
-    # Traverse SentenceTrie and add words to WordTrie
-    words = sentence_trie.traverse()
-    for word in words:
-        word_trie.insert(word)
+
+    #insert words from sentence trie to word Trie
+    word_trie.insert_data(sentence_trie)
+
 
 
 if __name__ == "__main__":
     sentenceTrie = sentence_trie.SentenceTrie()
     word_trie = word_trie.WordTrie()
     directory_path = "C:/Users/shire/Downloads/Archive2"
-    build_trie_from_files(directory_path, sentenceTrie, word_trie)
+    build_tries_from_files(directory_path, sentenceTrie, word_trie)
 

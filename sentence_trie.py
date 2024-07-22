@@ -1,4 +1,4 @@
-
+import typing
 class WordNode:
     def __init__(self, word, father, children=None):
         self.word = word
@@ -35,17 +35,20 @@ class SentenceTrie:
         father.children.append(node)  # add this children to the father
         return node
 
-    def traverse(self):
+    def find_all_nodes(self, root: WordNode) -> typing.List[WordNode]:
         """
-        Traverses the SentenceTrie and returns a list of all word nodes.
-        :return: List[WordNode]
+        Finds all the nodes of a node, called when there is a need to build words_trie
+        :param root: root node of the sentence trie
+        :return: a list of all the nodes
+        according to dfs
         """
-        result = []
+        nodes = []
+        stack = [root]
 
-        def traverse_node(node):
-            for child in node.children:
-                result.append(child)
-                traverse_node(child)
+        while stack:
+            current_node = stack.pop()
+            if current_node.word:
+                nodes.append(current_node)
+            stack.extend(current_node.children)
 
-        traverse_node(self.root)
-        return result
+        return nodes

@@ -1,6 +1,6 @@
 import sentence_trie
 from sentence_trie import WordNode
-
+import typing
 
 class TrieNode:
     """A node in the trie structure"""
@@ -23,6 +23,12 @@ class WordTrie:
     def __init__(self):
         self.root = TrieNode("")
 
+    def insert_data(self, sentence_trie: sentence_trie.SentenceTrie):
+        """ Insert all the words from sentence trie to wordTrie"""
+        word_nodes = sentence_trie.find_all_nodes(sentence_trie.root)
+        for wordNode in word_nodes:
+            self.insert(wordNode)
+
     def insert(self, word_node: WordNode):
         """Insert a word into the trie"""
         node = self.root
@@ -41,6 +47,6 @@ class WordTrie:
         # Increment the counter to indicate that we see this word once more
         node.counter += 1
         node.sentenceTrieRef.append(word_node)
-
+        #print(node.sentenceTrieRef)
 
 
