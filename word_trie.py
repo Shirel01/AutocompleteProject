@@ -47,6 +47,34 @@ class WordTrie:
         # Increment the counter to indicate that we see this word once more
         node.counter += 1
         node.sentenceTrieRef.append(word_node)
-        #print(node.sentenceTrieRef)
+
+
+    def dfs(self, node, prefix):
+        """Depth-first traversal of the trie
+
+        Args:
+            - node: the node to start with
+            - prefix: the current prefix, for tracing a
+                word while traversing the trie
+        """
+        if node.is_end_of_word:
+            self.output.append((prefix + node.char, node.counter))
+
+        for child in node.children.values():
+            self.dfs(child, prefix + node.char)
+
+    def search_prefix(self, prefix: str):
+        """Given a prefix if find it, return all words with this prefix  sort the words by the number of
+        times they have been inserted"""
+        self.output = []
+        node = self.root
+        for char in prefix:
+            if char in node.children:
+                node = node.children[char]
+            else:
+                return []
+        self.dfs(node, prefix[:-1])
+        #print(self.output)
+        return sorted(self.output, key=lambda prefix: prefix[1], reverse=True)  # sorted according to counter
 
 
