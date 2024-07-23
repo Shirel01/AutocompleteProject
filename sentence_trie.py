@@ -86,5 +86,42 @@ class SentenceTrie:
         complete_sentences = complete_sentence_iterative(original_node, initial_sentence)
         return complete_sentences, original_node.sources
 
+    def search_sentence_prefix(self, word_trie, prefix):
+        words = prefix.split()
+        if not words:
+            return []
+
+        # Recherche du premier mot dans le Word Trie
+        first_word_refs = word_trie.search_prefix(words[0])
+        if not first_word_refs:
+            return []
+
+        # Filtrage des références du premier mot dans le Sentence Trie
+        valid_refs = []
+        for word, frequency, refs in first_word_refs:
+            for ref in refs:
+                node = ref
+                valid = True
+                for word in words[1:]:
+                    found = False
+                    for child in node.children:
+                        if child.word == word:
+                            node = child
+                            found = True
+                            break
+                    if not found:
+                        valid = False
+                        break
+                if valid:
+                    valid_refs.append(node)
+
+        # Reconstruction et complétion de la phrase
+        complete_sentences_with_sources = []
+        for node in valid_refs:
+            sentences, source = self.reconstruct_sentence(node)
+            for sentence in sentences:
+                complete_sentences_with_sources.append((sentence, source))
+
+        return complete_sentences_with_sources
 
 

@@ -79,21 +79,4 @@ class WordTrie:
         self.dfs(node, prefix[:-1])
         return sorted(self.output, key=lambda prefix: prefix[1], reverse=True)  # sorted according to counter
 
-    def search_prefix_in_word_trie(self, prefix):
-
-        nodes = [self.root]
-
-        for word in prefix:
-            next_nodes = []
-            for node in nodes:
-                current_node = node
-                for char in word:
-                    if char in current_node.children:
-                        current_node = current_node.children[char]
-                    else:
-                        return []  # Aucun nœud correspondant trouvé
-                next_nodes.append(current_node)
-            nodes = next_nodes
-
-        return nodes
 
