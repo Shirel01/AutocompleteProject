@@ -1,5 +1,5 @@
 import sentence_trie
-from sentence_trie import WordNode
+
 import typing
 from dataclasses import dataclass
 import typing
@@ -32,7 +32,7 @@ class WordTrie:
         for wordNode in word_nodes:
             self.insert(wordNode)
 
-    def insert(self, word_node: WordNode):
+    def insert(self, word_node: sentence_trie.WordNode):
         """Insert a word into the trie"""
         node = self.root
         word = word_node.word
@@ -79,5 +79,21 @@ class WordTrie:
         self.dfs(node, prefix[:-1])
         return sorted(self.output, key=lambda prefix: prefix[1], reverse=True)  # sorted according to counter
 
+    def search_prefix_in_word_trie(self, prefix):
 
+        nodes = [self.root]
+
+        for word in prefix:
+            next_nodes = []
+            for node in nodes:
+                current_node = node
+                for char in word:
+                    if char in current_node.children:
+                        current_node = current_node.children[char]
+                    else:
+                        return []  # Aucun nœud correspondant trouvé
+                next_nodes.append(current_node)
+            nodes = next_nodes
+
+        return nodes
 
