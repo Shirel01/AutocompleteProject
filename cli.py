@@ -100,18 +100,11 @@ def main():
         if string == "exit":
             break
         else:
-            search_results = word_trie.search_prefix(string)
-            for word, frequency, references in search_results:
-                print(f"Word: {word}, Frequency: {frequency}")
-                for ref in references:
-                    sentences, source = sentence_trie.reconstruct_sentence(ref)
-                    for sentence in sentences:
-                        print(f"Complete Sentence: {sentence}, Source: {source}")
+            results = sentence_trie.search_sentence_prefix(word_trie, string)
+            for sentence, source in results:
+                print(f"Complete Sentence: {sentence}, Source: {source}")
 
-            """res: List[AutoCompleteData] = get_best_k_completion(string, word_trie, sentence_trie, 5)
-            for index in range(len(res)):
-                print(f"{index + 1}. {res[index].completed_sentence}. ({res[index].source_text}, {res[index].offset})")
-"""
+
 
 if __name__ == "__main__":
     main()
