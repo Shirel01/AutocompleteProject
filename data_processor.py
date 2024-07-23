@@ -45,7 +45,6 @@ if __name__ == "__main__":
     for word, frequency, references in search_results:
         print(f"Word: {word}, Frequency: {frequency}")
         for ref in references:
-            sentence, source = sentenceTrie.reconstruct_sentence(ref)
-            print(f"Complete Sentence: {sentence}, Source: {source}")
-
-
+            sentences, source = sentenceTrie.reconstruct_sentence(ref)
+            for sentence in sentences:
+                print(f"Complete Sentence: {sentence}, Source: {source}")

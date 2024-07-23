@@ -1,18 +1,19 @@
 import typing
+
+
 class WordNode:
     def __init__(self, word, father, sources=None, children=None):
         self.word = word
         self.father = father
-        self.sources = sources or []     #add field source
+        self.sources = sources or []  # add field source
         self.children = children or []
-
 
 
 class SentenceTrie:
     def __init__(self):
         self.root = WordNode(None, None)
 
-    def add_sentence(self, sentence: str, source_file:str) -> None:
+    def add_sentence(self, sentence: str, source_file: str) -> None:
         """
         Adds a sentence to the trie
         :param sentence: str
@@ -70,7 +71,6 @@ class SentenceTrie:
         def complete_sentence_iterative(start_node: WordNode, initial_sentence: typing.List[str]) -> typing.List[str]:
             stack = [(start_node, initial_sentence)]
             sentences = []
-
             while stack:
                 current_node, current_sentence = stack.pop()
                 if not current_node.children:
@@ -85,5 +85,3 @@ class SentenceTrie:
         # Start completing the sentence from the original node where prefix ends
         complete_sentences = complete_sentence_iterative(original_node, initial_sentence)
         return complete_sentences, original_node.sources
-
-    
