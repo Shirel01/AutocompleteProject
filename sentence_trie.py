@@ -1,7 +1,8 @@
 import typing
-
-from AutocompleteProject.word_trie import WordTrie
-from AutocompleteProject.word_trie import AutoCompleteData
+import word_trie
+from word_trie import AutoCompleteData
+#from AutocompleteProject.word_trie import WordTrie
+#from AutocompleteProject.word_trie import AutoCompleteData
 
 class WordNode:
     def __init__(self, word, father, sources=None, children=None):
@@ -9,6 +10,9 @@ class WordNode:
         self.father = father
         self.sources = sources or []  # add field source
         self.children = children or []
+
+
+
 
 
 class SentenceTrie:
@@ -88,13 +92,13 @@ class SentenceTrie:
         complete_sentences = complete_sentence_iterative(original_node, initial_sentence)
         return complete_sentences, original_node.sources
 
-    def search_sentence_prefix(self, word_trie, prefix):
+    def search_sentence_prefix(self, wordTrie, prefix):
         words = prefix.split()
         if not words:
             return []
 
         # Recherche du premier mot dans le Word Trie
-        first_word_refs = word_trie.search_prefix(words[0])
+        first_word_refs = wordTrie.search_prefix(words[0])
         if not first_word_refs:
             return []
 
@@ -102,6 +106,7 @@ class SentenceTrie:
         valid_refs = []
         for word, frequency, refs in first_word_refs:
             for ref in refs:
+
                 node = ref
                 valid = True
                 for word in words[1:]:
@@ -126,6 +131,64 @@ class SentenceTrie:
 
         return complete_sentences_with_sources
 
+    def get_best_k_completions(self, prefix: str, wordTrie, k: int) -> typing.List[word_trie.AutoCompleteData]:
+        results = []
+
+        # Search for exact matches
+        exact_matches = self.search_sentence_prefix(wordTrie, prefix)
+        for sentence, source in exact_matches:
+            score = 2 * len(prefix)
+            results.append(AutoCompleteData(sentence, source, 0, score))
+
+        # If exact matches are less than k, find possible corrections
+        if len(results) < k:
+            possible_corrections = []
+
+            # Substitute a letter
+            possible_corrections.extend(substitute_letter(self, prefix, wordTrie))
+
+            # Add a missing letter
+            possible_corrections.extend(add_missing_letter(self, prefix, wordTrie))
+
+            # Remove an extra letter
+            possible_corrections.extend(remove_extra_letter(self, prefix, wordTrie))
+
+            all_results = sorted(results + possible_corrections, key=lambda x: x.score, reverse=True)
+            return all_results[:k]
+
+        return sorted(results, key=lambda x: x.score, reverse=True)[:k]
+def substitute_letter(sentence_trie, prefix, word_trie):
+    possible_corrections = []
+    for i in range(len(prefix)):
+        for char in 'abcdefghijklmnopqrstuvwxyz':
+            if char != prefix[i]:
+                corrected_prefix = prefix[:i] + char + prefix[i + 1:]
+                corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
+                for sentence, source in corrected_matches:
+                    score = calculate_score(corrected_prefix, sentence)
+                    possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
+    return possible_corrections
+def remove_extra_letter(sentence_trie, prefix, word_trie):
+    possible_corrections = []
+    for i in range(len(prefix)):
+        corrected_prefix = prefix[:i] + prefix[i + 1:]
+        corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
+        for sentence, source in corrected_matches:
+            score = calculate_score(corrected_prefix, sentence)
+            possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
+    return possible_corrections
+
+
+def add_missing_letter(sentence_trie, prefix: str, word_trie) -> typing.List[AutoCompleteData]:
+    possible_corrections = []
+    for i in range(len(prefix) + 1):
+        for char in 'abcdefghijklmnopqrstuvwxyz':
+            corrected_prefix = prefix[:i] + char + prefix[i:]
+            corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
+            for sentence, source in corrected_matches:
+                score = calculate_score(corrected_prefix, sentence)
+                possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
+    return possible_corrections
 
 def calculate_score(prefix: str, sentence: str) -> int:
     base_score = 2 * len(prefix)
@@ -143,29 +206,3 @@ def calculate_score(prefix: str, sentence: str) -> int:
             else:
                 penalties += 1
     return base_score - penalties
-
-
-def get_best_k_completions(prefix: str, word_trie: WordTrie, sentence_trie: SentenceTrie, k: int) -> typing.List[
-    AutoCompleteData]:
-    results = []
-
-
-    exact_matches = sentence_trie.search_sentence_prefix(word_trie, prefix)
-    for sentence, source in exact_matches:
-        score = 2 * len(prefix)
-        results.append(AutoCompleteData(sentence, source, 0, score))
-    if len(results) < k:
-        possible_corrections = []
-        for i in range(len(prefix)):
-            for char in 'abcdefghijklmnopqrstuvwxyz':
-                if char != prefix[i]:
-                    corrected_prefix = prefix[:i] + char + prefix[i + 1:]
-                    corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
-                    for sentence, source in corrected_matches:
-                        score = calculate_score(corrected_prefix, sentence)
-                        possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
-
-        all_results = sorted(results + possible_corrections, key=lambda x: x.score, reverse=True)
-        return all_results[:k]
-
-    return sorted(results, key=lambda x: x.score, reverse=True)[:k]

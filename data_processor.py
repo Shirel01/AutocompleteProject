@@ -30,6 +30,7 @@ def build_tries_from_files(directory, sentence_trie, word_trie):
                         cleaned_sentence = clean_text(line)
                         sentence_trie.add_sentence(cleaned_sentence, file_name)
 
+
     #insert words from sentence trie to word Trie
     word_trie.insert_data(sentence_trie)
 
@@ -41,8 +42,8 @@ if __name__ == "__main__":
     directory_path = "C:/Users/shire/Downloads/Archive2"
     build_tries_from_files(directory_path, sentenceTrie, wordTrie)
 
-    prefix = "hejjlo"
-    best_completions = sentence_trie.get_best_k_completions(prefix, wordTrie, sentenceTrie, 5)
+    prefix = "hell princess"
+    best_completions = sentenceTrie.get_best_k_completions(prefix, wordTrie, 5)
 
     for completion in best_completions:
         print(
