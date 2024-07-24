@@ -37,14 +37,14 @@ def build_tries_from_files(directory, sentence_trie, word_trie):
 
 if __name__ == "__main__":
     sentenceTrie = sentence_trie.SentenceTrie()
-    word_trie = word_trie.WordTrie()
+    wordTrie = word_trie.WordTrie()
     directory_path = "C:/Users/shire/Downloads/Archive2"
-    build_tries_from_files(directory_path, sentenceTrie, word_trie)
-    search_results = word_trie.search_prefix('is')
+    build_tries_from_files(directory_path, sentenceTrie, wordTrie)
 
-    for word, frequency, references in search_results:
-        print(f"Word: {word}, Frequency: {frequency}")
-        for ref in references:
-            sentences, source = sentenceTrie.reconstruct_sentence(ref)
-            for sentence in sentences:
-                print(f"Complete Sentence: {sentence}, Source: {source}")
+    prefix = "hejjlo"
+    best_completions = sentence_trie.get_best_k_completions(prefix, wordTrie, sentenceTrie, 5)
+
+    for completion in best_completions:
+        print(
+            f"Completed Sentence: {completion.completed_sentence}, Source: {completion.source_text}, Score: {completion.score}")
+

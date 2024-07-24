@@ -1,5 +1,7 @@
 import typing
 
+from AutocompleteProject.word_trie import WordTrie
+from AutocompleteProject.word_trie import AutoCompleteData
 
 class WordNode:
     def __init__(self, word, father, sources=None, children=None):
@@ -125,3 +127,45 @@ class SentenceTrie:
         return complete_sentences_with_sources
 
 
+def calculate_score(prefix: str, sentence: str) -> int:
+    base_score = 2 * len(prefix)
+    penalties = 0
+    for i, (p_char, s_char) in enumerate(zip(prefix, sentence)):
+        if p_char != s_char:
+            if i == 0:
+                penalties += 5
+            elif i == 1:
+                penalties += 4
+            elif i == 2:
+                penalties += 3
+            elif i == 3:
+                penalties += 2
+            else:
+                penalties += 1
+    return base_score - penalties
+
+
+def get_best_k_completions(prefix: str, word_trie: WordTrie, sentence_trie: SentenceTrie, k: int) -> typing.List[
+    AutoCompleteData]:
+    results = []
+
+
+    exact_matches = sentence_trie.search_sentence_prefix(word_trie, prefix)
+    for sentence, source in exact_matches:
+        score = 2 * len(prefix)
+        results.append(AutoCompleteData(sentence, source, 0, score))
+    if len(results) < k:
+        possible_corrections = []
+        for i in range(len(prefix)):
+            for char in 'abcdefghijklmnopqrstuvwxyz':
+                if char != prefix[i]:
+                    corrected_prefix = prefix[:i] + char + prefix[i + 1:]
+                    corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
+                    for sentence, source in corrected_matches:
+                        score = calculate_score(corrected_prefix, sentence)
+                        possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
+
+        all_results = sorted(results + possible_corrections, key=lambda x: x.score, reverse=True)
+        return all_results[:k]
+
+    return sorted(results, key=lambda x: x.score, reverse=True)[:k]

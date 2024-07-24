@@ -2,7 +2,15 @@ import sentence_trie
 
 import typing
 from dataclasses import dataclass
-import typing
+
+
+
+@dataclass
+class AutoCompleteData:
+    completed_sentence: str
+    source_text: str
+    offset: int
+    score: int
 
 
 class TrieNode:
@@ -26,13 +34,13 @@ class WordTrie:
     def __init__(self):
         self.root = TrieNode("")
 
-    def insert_data(self, sentence_trie: sentence_trie.SentenceTrie):
+    def insert_data(self, sentence_trie):
         """ Insert all the words from sentence trie to wordTrie"""
         word_nodes = sentence_trie.find_all_nodes(sentence_trie.root)
         for wordNode in word_nodes:
             self.insert(wordNode)
 
-    def insert(self, word_node: sentence_trie.WordNode):
+    def insert(self, word_node):
         """Insert a word into the trie"""
         node = self.root
         word = word_node.word
