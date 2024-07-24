@@ -157,6 +157,7 @@ class SentenceTrie:
             return all_results[:k]
 
         return sorted(results, key=lambda x: x.score, reverse=True)[:k]
+
 def substitute_letter(sentence_trie, prefix, word_trie):
     possible_corrections = []
     for i in range(len(prefix)):
@@ -165,7 +166,7 @@ def substitute_letter(sentence_trie, prefix, word_trie):
                 corrected_prefix = prefix[:i] + char + prefix[i + 1:]
                 corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
                 for sentence, source in corrected_matches:
-                    score = calculate_score(corrected_prefix, sentence)
+                    score = calculate_substitution_score(prefix, corrected_prefix)
                     possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
     return possible_corrections
 def remove_extra_letter(sentence_trie, prefix, word_trie):
@@ -174,7 +175,7 @@ def remove_extra_letter(sentence_trie, prefix, word_trie):
         corrected_prefix = prefix[:i] + prefix[i + 1:]
         corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
         for sentence, source in corrected_matches:
-            score = calculate_score(corrected_prefix, sentence)
+            score = calculate_add_remove_score(prefix, corrected_prefix)
             possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
     return possible_corrections
 
@@ -186,15 +187,15 @@ def add_missing_letter(sentence_trie, prefix: str, word_trie) -> typing.List[Aut
             corrected_prefix = prefix[:i] + char + prefix[i:]
             corrected_matches = sentence_trie.search_sentence_prefix(word_trie, corrected_prefix)
             for sentence, source in corrected_matches:
-                score = calculate_score(corrected_prefix, sentence)
+                score = calculate_add_remove_score(prefix, corrected_prefix)
                 possible_corrections.append(AutoCompleteData(sentence, source, 0, score))
     return possible_corrections
 
-def calculate_score(prefix: str, sentence: str) -> int:
+def calculate_substitution_score(prefix: str, corrected_prefix: str) -> int:
     base_score = 2 * len(prefix)
     penalties = 0
-    for i, (p_char, s_char) in enumerate(zip(prefix, sentence)):
-        if p_char != s_char:
+    for i, (p_char, c_char) in enumerate(zip(prefix, corrected_prefix)):
+        if p_char != c_char:
             if i == 0:
                 penalties += 5
             elif i == 1:
@@ -205,4 +206,22 @@ def calculate_score(prefix: str, sentence: str) -> int:
                 penalties += 2
             else:
                 penalties += 1
+    return base_score - penalties
+
+def calculate_add_remove_score(prefix: str, corrected_prefix: str) -> int:
+    base_score = 2 * len(prefix)
+    penalties = 0
+    length_diff = abs(len(prefix) - len(corrected_prefix))
+    if length_diff > 0:
+        for i in range(length_diff):
+            if i == 0:
+                penalties += 10
+            elif i == 1:
+                penalties += 8
+            elif i == 2:
+                penalties += 6
+            elif i == 3:
+                penalties += 4
+            else:
+                penalties += 2
     return base_score - penalties

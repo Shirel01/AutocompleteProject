@@ -42,7 +42,7 @@ if __name__ == "__main__":
     directory_path = "C:/Users/shire/Downloads/Archive2"
     build_tries_from_files(directory_path, sentenceTrie, wordTrie)
 
-    prefix = "hell princess"
+    prefix = "hello rincess"
     best_completions = sentenceTrie.get_best_k_completions(prefix, wordTrie, 5)
 
     for completion in best_completions:
